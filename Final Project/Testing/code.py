@@ -11,7 +11,12 @@ from adafruit_motorkit import MotorKit
 from adafruit_motor import stepper
 import neoPixelFunctions as neoFun
 import bopItFunctions as bopIt
+import audiocore
+import audiobusio
+import analogio
 
 while True:
     bopIt.home_Motor()
-    time.sleep(0.1)
+    time.sleep(1)
+   # bopIt.play_Wav("beep")
+    time.sleep(1)
