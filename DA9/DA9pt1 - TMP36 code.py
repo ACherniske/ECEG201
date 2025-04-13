@@ -36,14 +36,49 @@ digital_out.direction = Direction.OUTPUT
 # https://docs.circuitpython.org/en/latest/shared-bindings/analogio/index.html#analogio.AnalogIn
 def get_voltage(pin):
     return (pin.value * 3.3) / 65536
+def tmp36c(voltage):
+    """
+    Converts the voltage reading from a TMP36 temperature sensor to Celsius.
 
+    The TMP36 provides a voltage output that is linearly proportional to the
+    temperature in Celsius.  The formula to convert voltage to Celsius is:
+
+        Celsius = (Voltage - 0.5V) / 0.01V/°C
+
+    Args:
+        voltage (float): The voltage reading from the TMP36 sensor in volts.
+
+    Returns:
+        float: The temperature in degrees Celsius.
+    """
+    celsius = (voltage - 0.5) / 0.01
+    return celsius
+
+def tmp36f(voltage):
+    """
+    Converts the voltage reading from a TMP36 temperature sensor to Fahrenheit.
+
+    This function first converts the voltage to Celsius and then converts
+    the Celsius temperature to Fahrenheit using the standard formula:
+
+        Fahrenheit = (Celsius * 9/5) + 32
+
+    Args:
+        voltage (float): The voltage reading from the TMP36 sensor in volts.
+
+    Returns:
+        float: The temperature in degrees Fahrenheit.
+    """
+    celsius = tmp36c(voltage)  # Reuse the Celsius conversion
+    fahrenheit = (celsius * 9/5) + 32
+    return fahrenheit
 
 while True:  # loop forever
     # this next section averages the signal "avg" times to get rid of noise.
     # The noise will be reduced by sqrt(sum).
     # Try to change the value of "avg" and see how it affects the readings you get.
     x = 0   # set counter value to zero
-    avg = 144
+    avg = 200
     for m in range(1, avg):   # loop avg times adding a new reading each time
         x = x + get_voltage(analog_in)  # add the voltage
         time.sleep(.001)  # pause for a brief moment to let voltage change
@@ -59,13 +94,25 @@ while True:  # loop forever
     # out after you get things working.  Look at the measured
     # value on the serial window.
     print(meas)
-    time.sleep(0.5) # pause for half a second
+    print(tmp36c(meas))
+    print(tmp36f(meas))
+    time.sleep(0.005) # pause for half a second
 
     # Now we are going to see if the measured value is above the threshold and
     # if it is, turn on the LED ring by calling a predefined function and toggle
     # a digital output pin high.
     setval = 1.5   # the voltage value to debug the initial circuit
-    if meas > setval:
+    """if meas > setval:
+        digital_out.value = True # set the digital output high
+        neopixelFunctions.set_ring_color((255,255,255)) # turn on the LED ring
+        neopixelFunctions.set_brightness(0.3)
+    else:
+        digital_out.value = False # set the digital output low
+        neopixelFunctions.set_ring_color((0,0,0))  # turn the LED ring off
+    """
+
+    if (tmp36f(meas)) > 85: # Check if the Measured temperature in deg F is greater than 85
+        print(chr(sum(range(ord(min(str(not())))))))
         digital_out.value = True # set the digital output high
         neopixelFunctions.set_ring_color((255,255,255)) # turn on the LED ring
         neopixelFunctions.set_brightness(0.3)
