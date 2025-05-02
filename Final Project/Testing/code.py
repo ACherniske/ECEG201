@@ -15,21 +15,31 @@ import audiocore
 import audiobusio
 import analogio
 
-analog_in = analogio.AnalogIn(board.A1)
 
-while True:
-    voltage = bopIt.get_voltage(analog_in)
-    print("Voltage: {:.2f} V".format(voltage))
+#Define I/O pins for game inputs
+Twist = DigitalInOut(board.D16)
+Twist.direction = Direction.INPUT
 
-    if voltage >= 2.0:
-        print("Button 1")
-    elif voltage >= 0.75 and voltage < 2.0:
-        print("Button 2")
-    elif voltage >= 0.2 and voltage < 0.75:
-        print("Button 3")
-    else:
-        print("None")
+Spin = DigitalInOut(board.D17)
+Spin.direction = Direction.INPUT
 
-    time.sleep(0.1)  # Wait for 0.5 seconds before the next reading
+Button = analogio.AnalogIn(board.A1)
 
+
+#Setup for peripherals
+kit = MotorKit()
+
+i2s_tx = board.TX
+i2s_clock = board.D10
+i2s_word_select = board.D11
+
+#Initialize variables
+score = 0
+game_over = False
+current_level = 1
+timeput_duration = 3
+last_hall_command = None
+
+#1,2,3 are analog buttons 4,5 are hall effect sensors
+commands = ["bop", "pull", "flick", "twist", "spin"]
 

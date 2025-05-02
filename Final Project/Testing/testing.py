@@ -37,3 +37,20 @@ while True:
         print("spinning")
     else: 
         print("not spinning")
+
+analog_in = analogio.AnalogIn(board.A1)
+
+while True:
+    voltage = bopIt.get_voltage(analog_in)
+    print("Voltage: {:.2f} V".format(voltage))
+
+    if voltage >= 2.0:
+        print("Bop It")
+    elif voltage >= 0.75 and voltage < 2.0:
+        print("Pull It")
+    elif voltage >= 0.2 and voltage < 0.75:
+        print("Flick It")
+    else:
+        print("None")
+
+    time.sleep(0.1)  # Wait for 0.5 seconds before the next reading
