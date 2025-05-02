@@ -27,6 +27,8 @@ ACTION_MAP = {
 }
 
 internet = WifiFunc.wifiObject()
+THINGSPEAK_CHANNEL = '2945278'
+THINGSPEAK_API_KEY = '4NDZLK80SP9ORQ21'
 kit = MotorKit()
 seed = None
 seed_i = 0
@@ -262,6 +264,8 @@ def play_game(button, Hall1, Hall2, seed, max_index):
         time.sleep(1)
     print(f"Your score: {score}")
     print(f"Bops: {bops}, Pulls: {pulls}, Flicks: {flicks}, Twists: {twists}, Spins: {spins}")
+    request_msg = "https://api.thingspeak.com/update?api_key={}&field{}={}&field{}={}&field{}={}&field{}={}&field{}={}&field{}={}".format(THINGSPEAK_API_KEY,'1',bops,'2',pulls,'3',flicks,'4',twists,'5',spins,'6',score)
+    internet.api_get(request_msg)
     
     # After game ends, return to idle state
     print("Game over! Returning to idle state...")

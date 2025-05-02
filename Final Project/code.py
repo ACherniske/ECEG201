@@ -19,8 +19,8 @@ import neoPixelFunctions as NeoFunc
 
 # Wifi/Thingspeak Setup
 internet = WifiFunc.wifiObject()
-THINGSPEAK_CHANNEL = '2919092'
-THINGSPEAK_API_KEY = '3CMOI900I81XL9C2'
+THINGSPEAK_CHANNEL = '2945278'
+THINGSPEAK_API_KEY = '4NDZLK80SP9ORQ21'
 
 # Neopixel Setup
 NEO_Brightness = 0.9
