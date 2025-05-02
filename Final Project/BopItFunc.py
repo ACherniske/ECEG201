@@ -22,7 +22,7 @@ ACTION_MAP = {
     1: "BOP",
     2: "PULL",
     3: "FLICK",
-    4: "SPIN",  # hall_1
+    4: "TWIST",  # hall_1
     5: "TWIST"   # hall_2
 }
 
@@ -34,12 +34,17 @@ num = None
 max_index = 0
 idle = True
 last_input_time = 0
+bops = 0
+pulls = 0
+flicks = 0
+twists = 0
+spins = 0
 
 
 def get_voltage(pin): # Specify Analog Pin
     return (pin.value * 3.3) / 65536  # Convert 16-bit analog reading to voltage
 
-def detect_Button(analog_read_function, thresholds=(1.0, 1.5, 2.0)): # (0,1,2)
+def detect_Button(analog_read_function, thresholds=(.2, .7, 1.2)): # (0,1,2)
     # ex. detect_Button(get_voltage(analog_in), (1.0, 1.5, 2.0))
     voltage = analog_read_function
     button_pressed = 0  # Initialize button_pressed to None
@@ -56,7 +61,7 @@ def detect_Button(analog_read_function, thresholds=(1.0, 1.5, 2.0)): # (0,1,2)
 def detect_hall(Hall1, Hall2):
     if not Hall1.value:  # Hall sensors are often active-low
         return 4  # Hall sensor 1
-    elif not Hall2.value:
+    elif Hall2.value:
         return 5  # Hall sensor 2
     return 0
 
@@ -107,8 +112,10 @@ def idle_state(button, Hall1, Hall2):
     last_sound_time = time.monotonic()
     global seed_i, seed, max_index
     #print(seed_i, max_index)
+    home_Motor(Hall2)
     while True:
-        
+        NeoFunc.animate_snake((255,0,0),2,0,24)
+
         button_value = detect_Button(get_voltage(button), (0.2, 0.7, 1.2))
         hall_value = detect_hall(Hall1, Hall2)
         #print(button_value, hall_value)
@@ -119,13 +126,13 @@ def idle_state(button, Hall1, Hall2):
         # print(current_time, last_sound_time)
         if current_time - last_sound_time >= 60:
             print("Playing idle sound...")
-            #play_Wav("idle")  # Play the idle sound
-            #play_Wav("idle")  # Play the idle sound
-            #play_Wav("idle")  # Play the idle sound
+            play_Wav("idle")  # Play the idle sound
+            play_Wav("idle")  # Play the idle sound
+            play_Wav("idle")  # Play the idle sound
             last_sound_time = current_time  # Reset the timer
         
         # Check for button input to start a game
-        if button_value != 0 or hall_value != 0:
+        if button_value != 0:
             # Ensure we have a valid seed
             if seed is None or max_index is None:
                 seed, max_index = generate_seed()
@@ -198,6 +205,11 @@ def play_game(button, Hall1, Hall2, seed, max_index):
     global seed_i
     global last_input_time
     input_received = 0
+    bops = 0
+    pulls = 0
+    flicks = 0
+    twists = 0
+    spins = 0
     
     print("Starting game...")
     time.sleep(1)
@@ -209,7 +221,10 @@ def play_game(button, Hall1, Hall2, seed, max_index):
     last_input_time = time.monotonic()
     
     while True:
-            
+        input_received = 0
+        home_Motor(Hall2)
+        time.sleep(1)
+        NeoFunc.set_ring_color((255,255,255))    
         action = get_random_action(seed)
         print(f"{action} IT!")
         play_Wav(f"{action}_C")
@@ -218,14 +233,26 @@ def play_game(button, Hall1, Hall2, seed, max_index):
             input_received = wait_for_input(button, Hall1, Hall2)
             if input_received != 0:
                 print(f"Input received: {input_received}")
-        
         if ACTION_MAP[input_received] == action:
+            NeoFunc.set_ring_color((0,255,0))
             print("Correct!")
             score += 1
+            if action == "BOP":
+                bops += 1
+            elif action == "PULL":
+                pulls += 1
+            elif action == "FLICK":
+                flicks += 1
+            elif action == "TWIST":
+                twists += 1
+            elif action == "SPIN":
+                spins += 1
             play_Wav(f"{action}_R")
             last_input_time = time.monotonic()  # Reset the last input time
             input_received = 0  # Reset input_received for the next round
+            
         else:
+            NeoFunc.set_ring_color((255,0,0))
             print(f"Incorrect! You Did {ACTION_MAP[input_received]} instead of {action}")
             play_Wav("LOSE_C")
             time.sleep(0.1)
@@ -233,7 +260,8 @@ def play_game(button, Hall1, Hall2, seed, max_index):
             break
             
         time.sleep(1)
-        print(f"Your score: {score}")
+    print(f"Your score: {score}")
+    print(f"Bops: {bops}, Pulls: {pulls}, Flicks: {flicks}, Twists: {twists}, Spins: {spins}")
     
     # After game ends, return to idle state
     print("Game over! Returning to idle state...")

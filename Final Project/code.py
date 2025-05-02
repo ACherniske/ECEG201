@@ -23,7 +23,7 @@ THINGSPEAK_CHANNEL = '2919092'
 THINGSPEAK_API_KEY = '3CMOI900I81XL9C2'
 
 # Neopixel Setup
-NEO_Brightness = 0.5
+NEO_Brightness = 0.9
 NeoFunc.set_brightness(NEO_Brightness)
 
 # Audio Setup
@@ -49,8 +49,8 @@ ACTION_MAP = {
     1: "BOP",
     2: "PULL",
     3: "FLICK",
-    4: "SPIN",  # hall_1
-    5: "TWIST"   # hall_2
+    4: "TWIST",  # hall_1
+    5: "SPIN"   # hall_2
 }
 
 seed, max_index = BopItFunc.generate_seed()

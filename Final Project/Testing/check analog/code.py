@@ -3,19 +3,25 @@ import analogio
 from digitalio import DigitalInOut, Direction, Pull
 import board
 import time
+import neoPixelFunctions as NeoFunc
+import neopixel
+import rainbowio
 
 buttons = analogio.AnalogIn(board.A0)
-Hall1 = DigitalInOut(board.A1)
-Hall1.direction = Direction.INPUT
-Hall1.pull = Pull.UP
-Hall2 = DigitalInOut(board.A2)
-Hall2.direction = Direction.INPUT
-Hall2.pull = Pull.UP
+#Hall1 = DigitalInOut(board.A1)
+#Hall1.direction = Direction.INPUT
+#Hall1.pull = Pull.UP
+#Hall2 = DigitalInOut(board.A2)
+#Hall2.direction = Direction.INPUT
+#Hall2.pull = Pull.UP
 
+NeoFunc.set_brightness(0.5)
 
 while True:
     get_Voltage = (buttons.value * 3.3) / 65536  # Convert 16-bit analog reading to voltage
     print(get_Voltage)
+    NeoFunc.animate_snake((255,0,0),4,0,24)
+    
 
 """def wait(button, Hall1, Hall2):
     while True:
